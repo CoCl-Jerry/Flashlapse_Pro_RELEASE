@@ -1077,7 +1077,7 @@ class Ui_MainWindow(object):
         self.Capture_frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Capture_frame_2.setObjectName("Capture_frame_2")
         self.gridLayoutWidget = QtWidgets.QWidget(self.Capture_frame_2)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 151, 183))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 151, 171))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
