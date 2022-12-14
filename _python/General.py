@@ -14,7 +14,7 @@ def init():
     global serial_reference
     serial_reference = serial.Serial(
         port="/dev/ttyUSB_RS485",
-        baudrate=2400,
+        baudrate=4800,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
@@ -67,7 +67,8 @@ def init():
     #                       start of error image declarations                      #
     # ---------------------------------------------------------------------------- #
     global communication_error_image
-    communication_error_image = QtGui.QImage("../_image/communication_error.png")
+    communication_error_image = QtGui.QImage(
+        "../_image/communication_error.png")
 
     global motor_error_image
     motor_error_image = QtGui.QImage("../_image/motor_error.png")
@@ -82,7 +83,8 @@ def init():
     soil_sensor_error_image = QtGui.QImage("../_image/soil_sensor_error.png")
 
     global storage_critical_error_image
-    storage_critical_error_image = QtGui.QImage("../_image/storage_critical_error.png")
+    storage_critical_error_image = QtGui.QImage(
+        "../_image/storage_critical_error.png")
 
     # ---------------------------------------------------------------------------- #
     #                        start of lighting declarations                        #
@@ -174,7 +176,7 @@ def init():
     #                         start of motion declarations                         #
     # ---------------------------------------------------------------------------- #
     global current_speed
-    current_speed = 2
+    current_speed = 3
 
     global current_position
     current_position = 0
@@ -189,7 +191,7 @@ def init():
     target_direction = 0
 
     global max_position
-    max_position = 155
+    max_position = 135
 
     global min_position
     min_position = 65
@@ -238,7 +240,8 @@ def init():
     # ---------------------------------------------------------------------------- #
 
     global soil_sensor_request
-    soil_sensor_request = bytes([0x01, 0x03, 0x02, 0x00, 0x00, 0x07, 0x05, 0xB0])
+    soil_sensor_request = bytes(
+        [0x01, 0x03, 0x02, 0x00, 0x00, 0x07, 0x05, 0xB0])
 
     global soil_sensor_time_stamp
     soil_sensor_time_stamp = []
