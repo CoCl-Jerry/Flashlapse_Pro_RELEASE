@@ -18,7 +18,7 @@ def init():
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        timeout=1,
+        timeout=5,
     )
 
     # ---------------------------------------------------------------------------- #
@@ -60,6 +60,9 @@ def init():
     global soil_sensor_error
     soil_sensor_error = False
 
+    global storage_critical_error
+    storage_critical_error = False
+
     # ---------------------------------------------------------------------------- #
     #                       start of error image declarations                      #
     # ---------------------------------------------------------------------------- #
@@ -77,6 +80,9 @@ def init():
 
     global soil_sensor_error_image
     soil_sensor_error_image = QtGui.QImage("../_image/soil_sensor_error.png")
+
+    global storage_critical_error_image
+    storage_critical_error_image = QtGui.QImage("../_image/storage_critical_error.png")
 
     # ---------------------------------------------------------------------------- #
     #                        start of lighting declarations                        #
@@ -192,7 +198,7 @@ def init():
     #                     start of general sensor declarations                     #
     # ---------------------------------------------------------------------------- #
     global sensor_capture_interval
-    sensor_capture_interval = 5
+    sensor_capture_interval = 60
 
     # ---------------------------------------------------------------------------- #
     #                     start of ambient sensor declarations                     #

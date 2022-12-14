@@ -2,7 +2,6 @@ import General
 import Communication
 import UI_Update
 
-
 # ---------------------------------------------------------------------------- #
 def lighting_confirm(self):
     if (

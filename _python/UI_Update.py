@@ -1,5 +1,6 @@
 import General
 import Lighting
+import os
 from PyQt5.QtGui import QImage, QPixmap
 from pyqtgraph import mkPen  # type: ignore
 
@@ -7,7 +8,7 @@ from pyqtgraph import mkPen  # type: ignore
 #                             graph initialization                             #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-def graph_init(self):
+def init(self):
     styles = {"color": "r", "font-size": "15px"}
 
     self.ambient_temperature_graphWidget.setBackground("#fbfbfb")
@@ -67,6 +68,14 @@ def graph_init(self):
     self.soil_potassium_graphWidget.setLabel("left", "Potassium (mg/kg)", **styles)
     self.soil_potassium_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
+    filesystem = os.statvfs("/")
+    free_space = filesystem.f_bsize * filesystem.f_bavail
+    free_space_mb = free_space / (1024 * 1024)
+    if free_space_mb < 500:
+        General.storage_critical_error = True
+        error_UI_update(self)
+        print("remaining storage space:" + str(free_space_mb))
+
 
 # ---------------------------------------------------------------------------- #
 #                                error UI update                               #
@@ -79,6 +88,11 @@ def error_UI_update(self):
     if General.communication_error:
         self.imaging_preview_frame.setPixmap(QPixmap(General.communication_error_image))
         General.communication_error = False
+    if General.storage_critical_error:
+        self.imaging_preview_frame.setPixmap(
+            QPixmap(General.storage_critical_error_image)
+        )
+        self.setEnabled(False)
 
 
 # ---------------------------------------------------------------------------- #
@@ -171,10 +185,10 @@ def lighting_horizontalSlider_unblock_signals(self):
 # ---------------------------------------------------------------------------- #
 def lighting_adaptive_IR_toggle(self):
     if not General.lighting_adaptive_IR:
-        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: OFF")
+        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: ON")
         General.lighting_adaptive_IR = 1
     else:
-        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: ON")
+        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: OFF")
         General.lighting_adaptive_IR = 0
     Lighting.lighting_adaptive_IR()
 
@@ -262,6 +276,10 @@ def motion_dials_update(self):
     self.motion_torque_dial_value_label.setText(
         "Torque Level: " + str(self.motion_torque_dial.value())
     )
+
+
+def airflow_slider_changed(self):
+    self.airflow_value_label.setText(str(self.airflow_horizontalSlider.value()) + " %")
 
 
 # ---------------------------------------------------------------------------- #
@@ -415,7 +433,7 @@ def ambient_o2_frame_toggle(self):
 
 
 def ambient_sensor_tab_update(self):
-    if General.ambient_sensor_time_stamp:
+    if len(General.ambient_sensor_time_stamp) > 1:
         if self.mainwindow_tabWidget.currentIndex() == 3:
             if self.ambient_sensors_tabWidget.currentIndex() == 0:
                 General.ambient_temperature_graph_ref.setData(
@@ -477,7 +495,6 @@ def soil_sensor_initialize(self):
     General.soil_potassium_graph_ref = self.soil_potassium_graphWidget.plot(
         General.soil_sensor_time_stamp, General.soil_potassium, pen=pen
     )
-
     soil_update_labels(self)
 
 
@@ -525,7 +542,7 @@ def soil_sensor_reset(self):
 
 # ---------------------------------------------------------------------------- #
 def soil_sensors_tab_update(self):
-    if General.soil_sensor_time_stamp:
+    if len(General.soil_sensor_time_stamp) > 1:
         if self.mainwindow_tabWidget.currentIndex() == 4:
             if self.soil_sensors_tabWidget.currentIndex() == 0:
                 General.soil_temperature_graph_ref.setData(
