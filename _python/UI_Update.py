@@ -1,5 +1,6 @@
 import General
 import Lighting
+import os
 from PyQt5.QtGui import QImage, QPixmap
 from pyqtgraph import mkPen  # type: ignore
 
@@ -7,22 +8,28 @@ from pyqtgraph import mkPen  # type: ignore
 #                             graph initialization                             #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------------------------------------------------- #
-def graph_init(self):
+
+
+def init(self):
     styles = {"color": "r", "font-size": "15px"}
 
     self.ambient_temperature_graphWidget.setBackground("#fbfbfb")
     self.ambient_temperature_graphWidget.showGrid(x=True, y=True)
-    self.ambient_temperature_graphWidget.setLabel("left", "Temperature (°C)", **styles)
-    self.ambient_temperature_graphWidget.setLabel("bottom", "Time (s)", **styles)
+    self.ambient_temperature_graphWidget.setLabel(
+        "left", "Temperature (°C)", **styles)
+    self.ambient_temperature_graphWidget.setLabel(
+        "bottom", "Time (s)", **styles)
 
     self.ambient_humidity_graphWidget.setBackground("#fbfbfb")
     self.ambient_humidity_graphWidget.showGrid(x=True, y=True)
-    self.ambient_humidity_graphWidget.setLabel("left", "Humidity (%)", **styles)
+    self.ambient_humidity_graphWidget.setLabel(
+        "left", "Humidity (%)", **styles)
     self.ambient_humidity_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
     self.ambient_co2_graphWidget.setBackground("#fbfbfb")
     self.ambient_co2_graphWidget.showGrid(x=True, y=True)
-    self.ambient_co2_graphWidget.setLabel("left", "Carbon Dioxide (PPM)", **styles)
+    self.ambient_co2_graphWidget.setLabel(
+        "left", "Carbon Dioxide (PPM)", **styles)
     self.ambient_co2_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
     self.ambient_o2_graphWidget.setBackground("#fbfbfb")
@@ -32,13 +39,16 @@ def graph_init(self):
 
     self.soil_temperature_graphWidget.setBackground("#fbfbfb")
     self.soil_temperature_graphWidget.showGrid(x=True, y=True)
-    self.soil_temperature_graphWidget.setLabel("left", "Temperature (°C)", **styles)
+    self.soil_temperature_graphWidget.setLabel(
+        "left", "Temperature (°C)", **styles)
     self.soil_temperature_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
     self.soil_water_content_graphWidget.setBackground("#fbfbfb")
     self.soil_water_content_graphWidget.showGrid(x=True, y=True)
-    self.soil_water_content_graphWidget.setLabel("left", "Water Content (%)", **styles)
-    self.soil_water_content_graphWidget.setLabel("bottom", "Time (s)", **styles)
+    self.soil_water_content_graphWidget.setLabel(
+        "left", "Water Content (%)", **styles)
+    self.soil_water_content_graphWidget.setLabel(
+        "bottom", "Time (s)", **styles)
 
     self.soil_EC_graphWidget.setBackground("#fbfbfb")
     self.soil_EC_graphWidget.showGrid(x=True, y=True)
@@ -54,18 +64,29 @@ def graph_init(self):
 
     self.soil_nitrogen_graphWidget.setBackground("#fbfbfb")
     self.soil_nitrogen_graphWidget.showGrid(x=True, y=True)
-    self.soil_nitrogen_graphWidget.setLabel("left", "Nitrogen (mg/kg)", **styles)
+    self.soil_nitrogen_graphWidget.setLabel(
+        "left", "Nitrogen (mg/kg)", **styles)
     self.soil_nitrogen_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
     self.soil_phosphorus_graphWidget.setBackground("#fbfbfb")
     self.soil_phosphorus_graphWidget.showGrid(x=True, y=True)
-    self.soil_phosphorus_graphWidget.setLabel("left", "Phosphorus (mg/kg)", **styles)
+    self.soil_phosphorus_graphWidget.setLabel(
+        "left", "Phosphorus (mg/kg)", **styles)
     self.soil_phosphorus_graphWidget.setLabel("bottom", "Time (s)", **styles)
 
     self.soil_potassium_graphWidget.setBackground("#fbfbfb")
     self.soil_potassium_graphWidget.showGrid(x=True, y=True)
-    self.soil_potassium_graphWidget.setLabel("left", "Potassium (mg/kg)", **styles)
+    self.soil_potassium_graphWidget.setLabel(
+        "left", "Potassium (mg/kg)", **styles)
     self.soil_potassium_graphWidget.setLabel("bottom", "Time (s)", **styles)
+
+    filesystem = os.statvfs("/")
+    free_space = filesystem.f_bsize * filesystem.f_bavail
+    free_space_mb = free_space / (1024 * 1024)
+    if free_space_mb < 500:
+        General.storage_critical_error = True
+        error_UI_update(self)
+        print("remaining storage space:" + str(free_space_mb))
 
 
 # ---------------------------------------------------------------------------- #
@@ -74,11 +95,18 @@ def graph_init(self):
 # ---------------------------------------------------------------------------- #
 def error_UI_update(self):
     if General.camera_error:
-        self.imaging_preview_frame.setPixmap(QPixmap(General.camera_error_image))
+        self.imaging_preview_frame.setPixmap(
+            QPixmap(General.camera_error_image))
         General.camera_error = False
     if General.communication_error:
-        self.imaging_preview_frame.setPixmap(QPixmap(General.communication_error_image))
+        self.imaging_preview_frame.setPixmap(
+            QPixmap(General.communication_error_image))
         General.communication_error = False
+    if General.storage_critical_error:
+        self.imaging_preview_frame.setPixmap(
+            QPixmap(General.storage_critical_error_image)
+        )
+        self.setEnabled(False)
 
 
 # ---------------------------------------------------------------------------- #
@@ -110,7 +138,8 @@ def lighting_spinbox_changed(self):
     General.lighting_green = self.lighting_green_spinBox.value()
     General.lighting_blue = self.lighting_blue_spinBox.value()
 
-    self.lighting_brightness_horizontalSlider.setValue(General.lighting_brightness)
+    self.lighting_brightness_horizontalSlider.setValue(
+        General.lighting_brightness)
     self.lighting_red_horizontalSlider.setValue(General.lighting_red)
     self.lighting_green_horizontalSlider.setValue(General.lighting_green)
     self.lighting_blue_horizontalSlider.setValue(General.lighting_blue)
@@ -123,7 +152,8 @@ def lighting_update(self):
     lighting_spinbox_block_signals(self)
     lighting_horizontalSlider_block_signals(self)
 
-    self.lighting_brightness_horizontalSlider.setValue(General.lighting_brightness)
+    self.lighting_brightness_horizontalSlider.setValue(
+        General.lighting_brightness)
     self.lighting_red_horizontalSlider.setValue(General.lighting_red)
     self.lighting_green_horizontalSlider.setValue(General.lighting_green)
     self.lighting_blue_horizontalSlider.setValue(General.lighting_blue)
@@ -171,12 +201,12 @@ def lighting_horizontalSlider_unblock_signals(self):
 # ---------------------------------------------------------------------------- #
 def lighting_adaptive_IR_toggle(self):
     if not General.lighting_adaptive_IR:
-        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: OFF")
+        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: ON")
         General.lighting_adaptive_IR = 1
     else:
-        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: ON")
+        self.lighting_adaptive_IR_pushButton.setText("Adaptive IR: OFF")
         General.lighting_adaptive_IR = 0
-    Lighting.lighting_adaptive_IR()
+    Lighting.lighting_adaptive_IR(self)
 
 
 # ---------------------------------------------------------------------------- #
@@ -216,14 +246,18 @@ def TOF_update(self):
 
 # ---------------------------------------------------------------------------- #
 def TOF_update_pushButton_toggle(self):
-    self.TOF_update_pushButton.setEnabled(not self.TOF_update_pushButton.isEnabled())
+    self.TOF_update_pushButton.setEnabled(
+        not self.TOF_update_pushButton.isEnabled())
 
 
 # ---------------------------------------------------------------------------- #
 def motion_frames_toggle(self):
-    self.motion_control_frame.setEnabled(not self.motion_control_frame.isEnabled())
-    self.motion_slider_frame.setEnabled(not self.motion_slider_frame.isEnabled())
-    self.motion_settings_frame.setEnabled(not self.motion_settings_frame.isEnabled())
+    self.motion_control_frame.setEnabled(
+        not self.motion_control_frame.isEnabled())
+    self.motion_slider_frame.setEnabled(
+        not self.motion_slider_frame.isEnabled())
+    self.motion_settings_frame.setEnabled(
+        not self.motion_settings_frame.isEnabled())
 
 
 # ---------------------------------------------------------------------------- #
@@ -264,6 +298,11 @@ def motion_dials_update(self):
     )
 
 
+def airflow_slider_changed(self):
+    self.airflow_value_label.setText(
+        str(self.airflow_horizontalSlider.value()) + " %")
+
+
 # ---------------------------------------------------------------------------- #
 #                               imaging UI update                              #
 # ---------------------------------------------------------------------------- #
@@ -272,7 +311,8 @@ def imaging_validate_input(self):
     General.full_storage_directory = (
         General.default_storage_directory + "/" + General.imaging_sequence_title
     )
-    self.imaging_storage_directory_label.setText(General.full_storage_directory)
+    self.imaging_storage_directory_label.setText(
+        General.full_storage_directory)
     if General.current_date not in General.imaging_sequence_title:
         self.imaging_add_date_pushButton.setEnabled(True)
     else:
@@ -300,7 +340,8 @@ def imaging_validate_input(self):
 
 # ---------------------------------------------------------------------------- #
 def imaging_frame_toggle(self):
-    self.imaging_capture_frame.setEnabled(not self.imaging_capture_frame.isEnabled())
+    self.imaging_capture_frame.setEnabled(
+        not self.imaging_capture_frame.isEnabled())
 
 
 # ---------------------------------------------------------------------------- #
@@ -338,10 +379,12 @@ def timelapse_countdown(self):
 # ---------------------------------------------------------------------------- #
 def imaging_AOI_horizontalSlider_changed(self):
     self.imaging_xAxis_label.setText(
-        "AXIS A: " + str(self.imaging_xAxis_horizontalSlider.sliderPosition() / 100)
+        "AXIS A: " +
+        str(self.imaging_xAxis_horizontalSlider.sliderPosition() / 100)
     )
     self.imaging_yAxis_label.setText(
-        "AXIS B: " + str(self.imaging_yAxis_horizontalSlider.sliderPosition() / 100)
+        "AXIS B: " +
+        str(self.imaging_yAxis_horizontalSlider.sliderPosition() / 100)
     )
 
 
@@ -383,7 +426,8 @@ def amibient_update_labels(self):
     self.ambient_temperture_value_label.setText(
         str(General.ambient_temperature[-1]) + " °C"
     )
-    self.ambient_humidity_value_label.setText(str(General.ambient_humidity[-1]) + " %")
+    self.ambient_humidity_value_label.setText(
+        str(General.ambient_humidity[-1]) + " %")
     self.ambient_co2_value_label.setText(str(General.ambient_CO2[-1]) + " ppm")
     self.ambient_o2_value_label.setText(str(General.ambient_o2[-1]) + " Vol%")
 
@@ -415,7 +459,7 @@ def ambient_o2_frame_toggle(self):
 
 
 def ambient_sensor_tab_update(self):
-    if General.ambient_sensor_time_stamp:
+    if len(General.ambient_sensor_time_stamp) > 1:
         if self.mainwindow_tabWidget.currentIndex() == 3:
             if self.ambient_sensors_tabWidget.currentIndex() == 0:
                 General.ambient_temperature_graph_ref.setData(
@@ -477,7 +521,6 @@ def soil_sensor_initialize(self):
     General.soil_potassium_graph_ref = self.soil_potassium_graphWidget.plot(
         General.soil_sensor_time_stamp, General.soil_potassium, pen=pen
     )
-
     soil_update_labels(self)
 
 
@@ -489,17 +532,20 @@ def soil_sensor_update(self):
 
 # ---------------------------------------------------------------------------- #
 def soil_update_labels(self):
-    self.soil_temperature_value_label.setText(str(General.soil_temperature[-1]) + " °C")
+    self.soil_temperature_value_label.setText(
+        str(General.soil_temperature[-1]) + " °C")
     self.soil_water_content_value_label.setText(
         str(General.soil_water_content[-1]) + " %"
     )
     self.soil_EC_value_label.setText(str(General.soil_EC[-1]) + " μS/cm")
     self.soil_pH_value_label.setText(str(General.soil_pH[-1]))
-    self.soil_nitrogen_value_label.setText(str(General.soil_nitrogen[-1]) + " mg/kg")
+    self.soil_nitrogen_value_label.setText(
+        str(General.soil_nitrogen[-1]) + " mg/kg")
     self.soil_phosphorus_value_label.setText(
         str(General.soil_phosphorus[-1]) + " mg/kg"
     )
-    self.soil_potassium_value_label.setText(str(General.soil_potassium[-1]) + " mg/kg")
+    self.soil_potassium_value_label.setText(
+        str(General.soil_potassium[-1]) + " mg/kg")
 
 
 # ---------------------------------------------------------------------------- #
@@ -525,7 +571,7 @@ def soil_sensor_reset(self):
 
 # ---------------------------------------------------------------------------- #
 def soil_sensors_tab_update(self):
-    if General.soil_sensor_time_stamp:
+    if len(General.soil_sensor_time_stamp) > 1:
         if self.mainwindow_tabWidget.currentIndex() == 4:
             if self.soil_sensors_tabWidget.currentIndex() == 0:
                 General.soil_temperature_graph_ref.setData(

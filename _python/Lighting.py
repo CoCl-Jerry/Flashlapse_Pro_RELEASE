@@ -2,8 +2,9 @@ import General
 import Communication
 import UI_Update
 
-
 # ---------------------------------------------------------------------------- #
+
+
 def lighting_confirm(self):
     if (
         self.lighting_inner_ring_checkBox.isChecked()
@@ -27,8 +28,10 @@ def lighting_reset(self):
 
 
 # ---------------------------------------------------------------------------- #
-def lighting_adaptive_IR():
+def lighting_adaptive_IR(self):
     Communication.sendCMD("3~" + str(General.lighting_adaptive_IR))
+    Communication.sendCMD(
+        "4~"+str(int(self.airflow_horizontalSlider.value()*2.55)))
 
 
 # ---------------------------------------------------------------------------- #
